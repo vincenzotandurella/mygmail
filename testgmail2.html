@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google Sign-In Example</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    function handleCredentialResponse(response) {
+      console.log("Encoded JWT ID token: " + response.credential);
+      // Qui puoi inviare il token al tuo server per la verifica e la gestione dell'accesso
+      fetch('/verify-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token: response.credential })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          console.log('User authenticated successfully');
+          document.getElementById('user-info').innerText = 'User authenticated successfully';
+        } else {
+          console.log('User authentication failed');
+          document.getElementById('user-info').innerText = 'User authentication failed';
+        }
+      });
+    }
+
+    window.onload = function () {
+      google.accounts.id.initialize({
+        client_id: '1015022987597-8vin6j9iprfn6g6f3j01m64c3ebqc56q.apps.googleusercontent.com', // Sostituisci con il tuo Client ID
+        callback: handleCredentialResponse
+      });
+      google.accounts.id.renderButton(
+        document.getElementById('buttonDiv'),
+        { theme: 'outline', size: 'large' }  // Personalizzazione del pulsante
+      );
+      google.accounts.id.prompt(); // Mostra automaticamente il prompt di accesso
+    };
+  </script>
+</head>
+<body>
+  <h1>Google Sign-In Example</h1>
+  <div id="buttonDiv"></div>
+  <p id="user-info"></p>
+</body>
+</html>
